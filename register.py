@@ -1,5 +1,6 @@
 import os
 import numpy as np
+from mysql_db import get_db
 from deepface import DeepFace
 from mysql_db import insert_employee
 
@@ -14,7 +15,6 @@ def register_all_employees():
             continue
 
         # CHECK IF EMPLOYEE ALREADY EXISTS
-        from mysql_db import get_db
         conn = get_db()
         cursor = conn.cursor()
         cursor.execute("SELECT id FROM employees WHERE name = %s", (employee_name,))
@@ -49,10 +49,10 @@ def register_all_employees():
             print("❌ No valid faces — skipping")
             continue
 
-        # Average embeddings
+        # AVERAGE EMBEDDINGS
         avg_embedding = np.mean(embeddings, axis=0)
 
-        # Store in DB
+        # STORE IN DB
         insert_employee(employee_name, avg_embedding.tolist())
         print(f"✅ Saved {employee_name} to database")
 

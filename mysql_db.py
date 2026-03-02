@@ -19,7 +19,38 @@ def get_db():
         use_pure=True,   # IMPORTANT: avoids C-extension crash
     )
 
-# ---------- INSERT EMPLOYEE ----------
+def init_db():
+    conn = get_db()
+    cursor = conn.cursor()
+
+    # CREATE EMPLOYEES TABLE
+    cursor.execute("""
+            CREATE TABLE IF NOT EXISTS employees (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                name VARCHAR(255) NOT NULL UNIQUE,
+                embedding LONGTEXT NOT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+    """)
+
+    # CREATE ATTENDANCE_LOGS TABLE
+    cursor.execute("""
+           CREATE TABLE IF NOT EXISTS attendance_logs (
+               id INT AUTO_INCREMENT PRIMARY KEY,
+               employee_id INT NOT NULL,
+               camera_name VARCHAR(100) NOT NULL,
+               direction ENUM('IN', 'OUT') NOT NULL,
+               timestamp DATETIME NOT NULL,
+               FOREIGN KEY (employee_id) REFERENCES employees(id)
+                   ON DELETE CASCADE
+           )
+    """)
+
+    conn.commit()
+    cursor.close()
+    conn.close()
+
+# INSERT EMPLOYEE
 def insert_employee(name, embedding):
     conn = get_db()
     cursor = conn.cursor()
@@ -40,7 +71,7 @@ def attendance_log(employee_id, camera_name, direction):
     cursor.close()
     conn.close()
 
-# ---------- GET ALL EMPLOYEES ----------
+# GET ALL EMPLOYEES
 def get_all_employees():
     conn = get_db()
     cursor = conn.cursor()
@@ -52,3 +83,6 @@ def get_all_employees():
     conn.close()
 
     return rows
+
+if __name__ == "__main__":
+    init_db()

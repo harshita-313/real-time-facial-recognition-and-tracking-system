@@ -18,7 +18,7 @@ DETECTOR = "opencv"
 MODEL = "ArcFace"
 THRESHOLD = 0.5
 ABSENCE_TIMEOUT = 60
-present = {}  # key - last_seen_time
+present = {}  # KEY: LAST_SEEN_TIME
 
 print("Script started", flush=True)
 
@@ -34,7 +34,7 @@ known_embeddings = []
 known_ids = []
 known_names = []
 
-# Convert embeddings to numpy + normalize
+# CONVERT EMBEDDINGS TO NUMPY + NORMALIZE
 for emp_id, name, emb_json in rows:
     emb = np.array(json.loads(emb_json), dtype=np.float32)
     emb = emb / np.linalg.norm(emb)
@@ -71,7 +71,7 @@ class RTSPStream:
         self.stopped = True
         self.cap.release()
 
-# Convert webcam index from string to int
+# CONVERT WEBCAM INDEX FROM STRING TO INT
 if rtsp_in_url and rtsp_in_url.isdigit():
     rtsp_in_url = int(rtsp_in_url)
 
@@ -127,11 +127,11 @@ while True:
                         key = (emp_id, rtsp_obj.direction)
                         now = time.time()
 
-                        # Log once when they "appear"
+                        # LOG ONCE WHEN THEY APPEAR
                         if key not in present:
                             attendance_log(emp_id, rtsp_obj.camera_name, rtsp_obj.direction)
 
-                        # Update last seen
+                        # UPDATE LAST SEEN
                         present[key] = now
 
                         color = (0, 255, 0)
@@ -151,7 +151,7 @@ while True:
 
         cv2.imshow(rtsp_obj.camera_name, display_frame)
 
-    # Cleanup: remove people who haven't been seen recently
+    # CLEANUP: REMOVE PEOPLE WHO HAVEN'T BEEN SEEN RECENTLY
     now = time.time()
     to_remove = [k for k, last_seen in present.items() if now - last_seen > ABSENCE_TIMEOUT]
     for k in to_remove:
